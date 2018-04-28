@@ -1,0 +1,13 @@
+OrdererOrgs:
+  - Name: ErpBlockchain
+    Domain: demo.erp-blockchain.cf
+    Specs:
+        - Hostname: orderer
+
+PeerOrgs:
+  - Name: Org1ErpBlockchain
+    Domain: org1.demo.erp-blockchain.cf
+    Template:
+      Count: 2
+    Users:
+      Count: 2

@@ -1,0 +1,113 @@
+
+name: "erp-blockchain"
+
+description: :"Network to host erp system"
+
+version: 2
+
+client:
+  
+  organization: Org1
+  
+  logging:
+    level: info
+  
+  peer:
+    timeout:
+      connection: 3s
+      queryResponse: 45s
+      executeTxResponse: 30s
+  eventService:
+    timeout:
+      connection: 3s
+      registrationResponse: 3s
+  orderer:
+    timeout:
+      connection: 3s
+      response: 5s
+
+  cryptoconfig:
+    path: "${GOPATH}/src/github.com/akshitkrnagpal/erp-blockchain/fixtures/crypto-config"
+
+  credentialStore:
+    path: "/tmp/erp-blockchain-kvs"
+
+  cryptoStore:
+    path: "/tmp/erp-blockchain-msp"
+
+  BCCSP: 
+    security:
+      enabled: true
+      default:
+        provider: "SW"
+      hashAlgorithm: "SHA2"
+      softVerify: true
+      ephemeral: false
+      level: 256
+
+  tlsCerts:
+    systemCertPool: false
+
+channels:
+  erp-blockchain:
+    orderers:
+      - orderer.demo.erp-blockchain.cf
+
+    peers:
+      peer0.org1.demo.erp-blockchain.cf:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer1.org1.demo.erp-blockchain.cf:
+
+organizations:
+  Org1:
+    mspid: org1.demo.erp-blockchain.cf
+    cryptoPath: "peerOrganizations/org1.demo.erp-blockchain.cf/users/{userName}@org1.demo.erp-blockchain.cf/msp"
+    peers:
+      - peer0.org1.demo.erp-blockchain.cf
+      - peer1.org1.demo.erp-blockchain.cf
+    certificateAuthorities:
+      - ca.org1.demo.erp-blockchain.cf
+
+orderers:
+  orderer.demo.erp-blockchain.cf:
+    url: grpcs://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer.demo.erp-blockchain.cf
+      grpc-max-send-message-length: 15
+    tlsCACerts:
+      path: "${GOPATH}/src/github.com/akshitkrnagpal/erp-blockchain/fixtures/crypto-config/ordererOrganizations/demo.erp-blockchain.cf/tlsca/tlsca.demo.erp-blockchain.cfo-cert.pem"
+
+peers:
+  peer0.org1.demo.erp-blockchain.cf:
+    url: grpcs://localhost:7051
+    eventUrl: grpcs://localhost:7053
+    grpcOptions:
+      ssl-target-name-override: peer0.org1.demo.erp-blockchain.cf
+      grpc.http2.keepalive_time: 15
+
+    tlsCACerts:
+      path: "${GOPATH}/src/github.com/akshitkrnagpal/erp-blockchain/fixtures/crypto-config/peerOrganizations/org1.demo.erp-blockchain.cf/tlsca/tlsca.org1.demo.erp-blockchain.cf-cert.pem"
+
+  peer1.org1.demo.erp-blockchain.cf:
+    url: grpcs://localhost:8051
+    eventUrl: grpcs://localhost:8053
+    grpcOptions:
+      ssl-target-name-override: peer1.org1.demo.erp-blockchain.cf
+      grpc.http2.keepalive_time: 15
+    tlsCACerts:
+      path: "${GOPATH}/src/github.com/akshitkrnagpal/erp-blockchain/fixtures/crypto-config/peerOrganizations/org1.demo.erp-blockchain.cf/tlsca/tlsca.org1.demo.erp-blockchain.cf-cert.pem"
+
+certificateAuthorities:
+  ca.org1.demo.erp-blockchain.cf:
+    url: https://localhost:7054
+    httpOptions:
+      verify: false
+    registrar:
+      enrollId: admin
+      enrollSecret: adminpw
+    caName: ca.org1.demo.erp-blockchain.cf
+

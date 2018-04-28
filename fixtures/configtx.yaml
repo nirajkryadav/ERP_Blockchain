@@ -1,0 +1,49 @@
+Profiles:
+    ErpBlockchain:
+      Orderer:
+        <<: *OrdererDefaults
+        Organizations:
+          - *ErpBlockchain
+      Application:
+        <<: *ApplicationDefaults
+        Organizations:
+          - *Org1ErpBlockchain
+      Consortium: SampleConsortium
+      Consortiums:
+        SampleConsortium:
+          Organizations:
+            - *ErpBlockchain
+            - *Org1ErpBlockchain
+
+Organizations:
+  - &ErpBlockchain
+      Name: ErpBlockchain
+      ID: demo.erp-blockchain.cf
+      AdminPrincipal: Role.ADMIN
+      MSPDir: crypto-config/ordererOrganizations/demo.erp-blockchain.cf/msp
+
+  - &Org1ErpBlockchain
+      Name: ErpBlockchainOrganization1
+      ID: org1:erp-blockchain.cf
+      AdminPrincipal: Role.ADMIN
+      MSPDir: crypto-config/peerOrganizations/org1.demo.erp-blockchain.cf/msp
+      AnchorPeers:
+        - Host: peer0.org1.demo.erp-blockchain.cf
+          Port: 7051
+
+
+Orderer: &OrdererDefaults
+  OrdererType: solo
+  Addresses:
+    - orderer.demo.erp-blockchain.cf:7050
+  BatchTimeout: 5s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 98 MB
+    PreferredMaxBytes: 512 KB
+  MaxChannels: 0
+
+  Organizations:
+
+Application: &ApplicationDefaults
+  Organizations:
